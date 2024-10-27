@@ -4,7 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 import os
-import logging
+import time
 
 # Load environment variables from .env file (for secure access to email credentials)
 load_dotenv()
@@ -12,42 +12,37 @@ EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')
 EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
 
-# Configure logging to track activity and errors; saves logs to email_logs.log
-logging.basicConfig(level=logging.INFO, filename='email_logs.log', filemode='a',
-                    format='%(asctime)s - %(levelname)s - %(message)s')
-
-
-# Load data from Excel files into pandas DataFrames    
-def load_excel_data(contractors_file, opportunities_file):
+# Read data from Excel files  
+def read_excel_data(file):
     try:
-        contractors_df = pd.read_excel(contractors_file)
-        opportunities_df = pd.read_excel(opportunities_file)
-        return contractors_df, opportunities_df
+        Nfile = pd.read_excel(file)
+        return Nfile
     except Exception as e:
-        logging.error(f"Error loading Excel files: {e}")
-        raise
+        with open("log.txt", 'a') as f:
+            f.write(f"Error loading Excel files: {str(e)}\n")
 
 
-# Filter the Data Based On  NAIC Code & Country
+# Filter the Data Based On  NAICS Code & Country
 def filter_opportunities(contractor, opportunities_df):
+    filtered_opps =[]
     
-    filtered_opps = opportunities_df[
-        (opportunities_df['NAICS Code'] == contractor['NAICS Code']) &
-        (opportunities_df['Country'] == contractor['Country'])
-    ]
+    for index, row in opportunities_df.iterrows():
+        if row['NAICS_Code'] == contractor['NAICS_Code'] and row['Country'] == contractor['Country']:
+            filtered_opps.append(row)
+    
     return filtered_opps
 
 
 # Create A Email Template
-def create_email_content(contractor, opportunities):
+def email_message(contractor, opportunities):
      
     greeting = f"Hello {contractor['Name']},\n\n"
     intro = "Here are some new business opportunities that match your profile:\n\n"
     
     # Build a list of opportunities to include in the email
     opp_list = ""
-    for index, opp in opportunities.iterrows():
-        opp_list += f"- {opp['Opportunity Title']}: {opp['Description']} (Location: {opp['Location']})\n"
+    for opp in opportunities:
+        opp_list = opp_list + f"- {opp['Opportunity Title']}: {opp['Description']} (Location: {opp['Location']})\n"
     
     closing = "\nBest regards,\nYour Business Opportunities Team"
     return greeting + intro + opp_list + closing
@@ -72,29 +67,32 @@ def send_email(recipient, subject, content):
         
         smtp_server.quit()
         
-        logging.info(f"Email sent to {recipient}")
+        with open("log.txt", 'a') as f:
+            f.write(f"{time.asctime(time.localtime(time.time()))}, Email sent to {recipient}\n")
         
     except Exception as e:
-        logging.error(f"Failed to send email to {recipient}: {e}")
+        with open("log.txt", 'a') as f:
+            f.write(f"{time.asctime(time.localtime(time.time()))},  Failed to send email to {recipient}: {e}\n")
 
 
-def main():
+
+if __name__ == "__main__":
+    
     contractors_file = 'contractors.xlsx'               # Path to contractors Excel file
     opportunities_file = 'opportunities.xlsx'           # Path to opportunities Excel file
     
     # Load contractors and opportunities data
-    contractors_df, opportunities_df = load_excel_data(contractors_file, opportunities_file)
+    contractors_df = read_excel_data(contractors_file)
+    opportunities_df = read_excel_data(opportunities_file)
     
     # Process each contractor to find relevant opportunities and send emails
-    for Index, contractor in contractors_df.iterrows():
+    for index, contractor in contractors_df.iterrows():
         relevant_opps = filter_opportunities(contractor, opportunities_df)
         
-        # If relevant opportunities exist, send an email; otherwise, log no matches
-        if not relevant_opps.empty:
-            email_content = create_email_content(contractor, relevant_opps)
+        # If relevant opportunities exist, send an email
+        if relevant_opps:
+            email_content = email_message(contractor, relevant_opps)
             send_email(contractor['Email'], "New Business Opportunities for You", email_content)
         else:
-            logging.info(f"No matching opportunities for {contractor['Name']}.")
-
-if __name__ == "__main__":
-    main()
+            with open("log.txt", 'a') as f:
+                f.write(f"No matching opportunities for {contractor['Name']}.")
