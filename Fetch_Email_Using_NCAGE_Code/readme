@@ -1,0 +1,3 @@
+Step 1 : go to terminal with same dir. and write " pip install -r requirements.txt"
+    or "pip install selenium pandas webdriver-manager"
+step 2 : Run the python script using command in terminal or directly run Button in vscode
