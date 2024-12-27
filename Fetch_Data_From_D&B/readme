@@ -1,0 +1,3 @@
+Step 1 : pip install -r requirements.txt or pip install pandas selenium
+Step 2 : Paste your search link in input.txt file 
+Step 3 : Run the code
