@@ -1,5 +1,6 @@
 import re
 import time
+import os
 import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -33,8 +34,18 @@ def handle_alert(driver):
 # Initialize the WebDriver
 driver = webdriver.Chrome()
 
+search_list = []
+input_file_name = 'input.txt'
+input_file_path = os.path.join(os.getcwd(), input_file_name)
+
+if os.path.exists(input_file_path):
+    with open(input_file_path, 'r') as file:
+        search_list = file.readlines()
+        
+        
 # URL of the page
-url = 'https://www.dnb.com/business-directory/company-information.residential_building_construction.co.html'
+url = search_list[0]
+# url = 'https://www.dnb.com/business-directory/company-information.residential_building_construction.co.html'
 driver.get(url)
 
 # Allow dynamic content to load
