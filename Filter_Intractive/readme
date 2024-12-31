@@ -1,2 +1,2 @@
 step 1 : pip install -r requirements.txt or pip install pandas folium streamlit
-step 2 : streamlit run Filter_intractive_map.py
+step 2 : streamlit run Filter_Intractive_USA_State.py
