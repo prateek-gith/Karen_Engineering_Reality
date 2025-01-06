@@ -1,8 +1,8 @@
 Step 1 : pip install -r requirements.txt or pip install pandas folium
-Step 2 : python Second_Intractive_Gen_Py_Code_V03.py
-Step 3 : It Take Input In Terminal 
-            1 : Enter the posted (From) date (e.g., 2025-01-02, YYYY-MM-DD) or "None" :
-            2 : Enter the Due (To) date (e.g., 2025-01-02,YYYY-MM-DD) or "None" :
-            3 : Enter the country name (e.g., USA) or All : 
+Step 2 : python Second_Intractive_Gen_Py_Code_V04.py
+Step 3 : It Take Input from excel Input Sheet
+            1 : Enter the Start date (e.g., 2025-01-02, YYYY-MM-DD) or NA:
+            2 : Enter the End date (e.g., 2025-01-02,YYYY-MM-DD) :
+            3 : Enter NaicsCode or 0 for all : 
 
-Note : it create A HTML File In Current Folder Or Open Automatic in default browser
+Note : it create Two HTML File In Current Folder and You Can Run HTML File In Browser
